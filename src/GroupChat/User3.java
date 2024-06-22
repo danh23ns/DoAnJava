@@ -1,0 +1,239 @@
+
+
+package GroupChat;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+
+
+public class User3 implements ActionListener,Runnable{
+    
+    JTextField text ;
+    JPanel a1;
+    static Box vertical = Box.createVerticalBox();
+    static JFrame f = new JFrame();
+    static DataOutputStream dout;
+    JScrollPane scrollPane;
+    BufferedWriter writer;
+    BufferedReader reader;
+    String name = "Chó:";
+    
+    User3(){
+       
+        
+        JPanel p1 = new JPanel();
+        p1.setBackground(new Color(0,0,0));
+        p1.setBounds(0, 0, 450, 70);
+        p1.setLayout(null);
+        f.add(p1);
+        
+        //nut quay lai
+        ImageIcon i1 = new ImageIcon(ClassLoader.getSystemResource("icon/3.png"));
+        Image i2 = i1.getImage().getScaledInstance(25, 25, Image.SCALE_DEFAULT);
+        ImageIcon i3 = new ImageIcon(i2);
+        JLabel back = new JLabel(i3);
+        back.setBounds(5, 20, 25, 25);
+        p1.add(back);
+        back.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent ae){
+                System.exit(0);
+            }
+        });
+        //anh dai dien
+        ImageIcon i4 = new ImageIcon(ClassLoader.getSystemResource("icon/mirzapur.png"));
+        Image i5 = i4.getImage().getScaledInstance(60, 60, Image.SCALE_DEFAULT);
+        ImageIcon i6 = new ImageIcon(i5);
+        JLabel profile = new JLabel(i6);
+        profile.setBounds(40, 10, 60, 60);
+        p1.add(profile);
+        
+        
+        //nut video
+        ImageIcon i7 = new ImageIcon(ClassLoader.getSystemResource("icon/video.png"));
+        Image i8 = i7.getImage().getScaledInstance(30, 30, Image.SCALE_DEFAULT);
+        ImageIcon i9 = new ImageIcon(i8);
+        JLabel video = new JLabel(i9);
+        video.setBounds(300, 20, 30, 30);
+        p1.add(video);
+        
+        //nut phone
+        ImageIcon i10 = new ImageIcon(ClassLoader.getSystemResource("icon/phone.png"));
+        Image i11 = i10.getImage().getScaledInstance(35, 30, Image.SCALE_DEFAULT);
+        ImageIcon i12 = new ImageIcon(i11);
+        JLabel phone = new JLabel(i12);
+        phone.setBounds(360, 20, 35, 30);
+        p1.add(phone);
+        
+        
+        ImageIcon i13 = new ImageIcon(ClassLoader.getSystemResource("icon/3icon.png"));
+        Image i14 = i13.getImage().getScaledInstance(10, 25, Image.SCALE_DEFAULT);
+        ImageIcon i15 = new ImageIcon(i14);
+        JLabel morevert = new JLabel(i15);
+        morevert.setBounds(420, 20, 10, 25);
+        p1.add(morevert);
+        
+        JLabel name = new JLabel("Animals");
+        name.setBounds(110, 15, 100, 18);
+        name.setForeground(Color.WHITE);
+        name.setFont(new Font("SAN_SERIF", Font.BOLD, 18));
+        p1.add(name);
+        
+        JLabel status = new JLabel("Chó, Mèo, Danh, Chuột, Cá, Gà");
+        status.setBounds(110, 35, 160, 18);
+        status.setForeground(Color.WHITE);
+        status.setFont(new Font("SAN_SERIF", Font.BOLD, 14));
+        p1.add(status);
+        
+        
+        //khung chat
+        a1 = new JPanel();
+        a1.setBounds(5, 75, 440, 570);
+        f.add(a1);
+        
+        text = new JTextField();
+        text.setBounds(5, 655, 310, 40);
+        text.setFont(new Font("SAN_SERIF", Font.PLAIN, 16));
+        
+        f.add(text);
+        
+        JButton send = new JButton("Gửi");
+        send.setBounds(320, 655, 123, 40);
+        send.setBackground(new Color(0,0,0));
+        send.setFont(new Font("SAN_SERIF", Font.PLAIN, 16));
+        send.setForeground(Color.white);
+        send.addActionListener(this);
+        f.add(send);
+        
+        f.setLayout(null);
+        f.setSize(450,700);
+        f.setUndecorated(true);
+        f.getContentPane().setBackground(Color.WHITE);
+        
+        f.setLocation(950,50);
+        f.setVisible(true);
+        
+        try{
+            Socket socket = new Socket("localhost", 2003);
+            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    
+    public void run(){
+        try{
+            String msg = "";
+            
+            while(true){
+                
+                msg = reader.readLine();
+                if(msg.contains(name)){
+                    continue;
+                }
+                JPanel panel = formatLabel(msg);
+                
+                JPanel left = new JPanel(new BorderLayout());
+                
+                left.add(panel, BorderLayout.LINE_START);
+                vertical.add(left);
+                a1.add(vertical, BorderLayout.PAGE_START);
+                
+                f.repaint();
+                f.invalidate();
+                f.validate();
+            }
+        }catch(Exception e){
+            
+        }
+    }
+    
+    
+    public static void main(String[] args){
+       User3 three = new User3();
+       Thread t1 = new Thread(three);
+       t1.start();
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent ae) {
+        try {
+        String out = "<html><p>" + name + "</p><p>" + text.getText() + "</p></html>";
+        
+        JPanel p2 = formatLabel(out);
+  
+        
+        JPanel right = new JPanel(new BorderLayout());
+        right.add(p2, BorderLayout.LINE_END);
+        vertical.add(right);
+        vertical.add(Box.createVerticalStrut(15));
+        
+         a1.setLayout(new BorderLayout());
+         a1.add(vertical, BorderLayout.PAGE_START);
+         
+         text.setText("");
+         
+        try{
+            writer.write(out);
+            writer.write("\r\n");
+            writer.flush();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+         
+         f.repaint();
+         f.invalidate();
+         f.validate();
+        }catch(Exception e){
+         e.printStackTrace();
+        }
+    }
+    
+    public static JPanel formatLabel(String out){
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        
+        JLabel output = new JLabel(out);
+        output.setFont(new Font("Tahoma", Font.PLAIN, 16));
+        output.setBackground(new Color(30,144,255));
+        output.setOpaque(true);
+        output.setBorder(new EmptyBorder(0, 15, 0, 50));
+        
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+        JLabel time = new JLabel();
+        time.setText(sdf.format(cal.getTime()));
+        
+        panel.add(time);
+        
+        panel.add(output);
+        
+        return panel;
+    }
+}
+
